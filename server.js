@@ -1,11 +1,9 @@
-var words = {
-	'rainbow': 5,
-	'unicorn': 3, 
-	'doom': -3,
-	'gloom': -2
-}
+var fs = require('fs');
+var data = fs.readFileSync('words.json'); 
+var words = JSON.parse(data); 
+console.log(words); 
 
-console.log("the server is starting!");
+// console.log("the server is starting!");
 
 const express = require('express');
 const app = express(); 
@@ -29,15 +27,26 @@ function addWord(req, res) {
 		reply = {
 			msg: "Please enter a score." 
 		}
+		res.send(reply); 
 	}
 	else {
-		words[word] = score; 
-		reply = {
-			msg: "Thank you for your word." 
+		words[word] = score;
+		var data = JSON.stringify(words, null, 2);
+
+		fs.writeFile('words.json', data, finished); 
+
+		function finished(err) {
+			console.log('all set.');
+			reply = {
+				word: word,
+				score: score,
+				status: "success" 
+			}
+			res.send(reply); 
 		}
+		 
 	}
 
-	res.send(reply); 
 } // end addWord
 
 app.get('/all', sendAll); 
@@ -67,3 +76,8 @@ function searchWord(req, res) {
 
 	res.send(reply); 
 }
+
+
+
+
+
